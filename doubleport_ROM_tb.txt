@@ -1,0 +1,85 @@
+// Dual Port ROM testbench
+
+module dual_port_rom_tb;
+
+  reg clk;
+
+  reg en1;
+  reg en2;
+
+  reg [3:0] addr1;
+  reg [3:0] addr2;
+
+  wire [3:0] data1;
+  wire [3:0] data2;
+
+  dual_port_rom r1(
+    .clk(clk),
+    .en1(en1),
+    .en2(en2),
+    .addr1(addr1),
+    .addr2(addr2),
+    .data1(data1),
+    .data2(data2)
+  );
+
+  initial
+    begin
+      $dumpfile("dump.vcd");
+      $dumpvars(1, dual_port_rom_tb);
+
+      clk = 1'b1;
+      forever #5 clk = ~clk;
+    end
+
+  initial
+    begin
+      en1 = 1'b0;
+      en2 = 1'b0;
+
+      #10;
+
+      // Enable both ports
+      en1 = 1'b1;
+      en2 = 1'b1;
+
+      addr1 = 4'b1010;
+      addr2 = 4'b0110;
+
+      #10;
+
+      addr1 = 4'b0011;
+      addr2 = 4'b1000;
+
+      #10;
+
+      // Disable port 1
+      en1 = 1'b0;
+      addr1 = 4'b1111;
+
+      // Port 2 active
+      addr2 = 4'b0000;
+
+      #10;
+
+      // Enable port 1 again
+      en1 = 1'b1;
+      addr1 = 4'b0101;
+
+      // Disable port 2
+      en2 = 1'b0;
+
+      #10;
+
+      addr1 = 4'b0010;
+      addr2 = 4'bxxxx;
+
+      #10;
+    end
+
+  initial
+    begin
+      #60 $stop;
+    end
+
+endmodule
